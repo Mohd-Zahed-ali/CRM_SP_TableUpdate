@@ -1,0 +1,21 @@
+create procedure UDP_Product(@iTransId bigint,@iUserId int)
+as begin
+	declare @transid bigint =0
+	select @transid = dbo.fCrm_IntToAPITransId(@iTransId,0)
+	declare @product int =0
+	declare @code varchar(max) =''
+	declare @codenum int =0
+	DECLARE @RES varchar(max)=''
+
+		select @product=iProductGroup from vCore_Product where iMasterId = @transid
+		select @code=sCode from vCore_Product where iMasterId =@product
+		select @codenum=count(iProductGroup) from vCore_Product where iProductGroup =@product and iMasterId<@transid
+		set @codenum =@codenum+1
+
+			if(isnull(@code,'')<>'')
+			begin
+			SET @RES=CONCAT(@code,'-',@codenum)
+			update vCore_Product set sCode = @RES where iMasterId = @transid
+			end
+			update vCore_Product set sCode = @RES where iMasterId = @transid
+end
