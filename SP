@@ -1,0 +1,13 @@
+create proc UDP_GetPMSContractstatus(@iTransId bigint,@iUserId int)
+as
+begin
+select @iTransId= dbo.fCrm_IntToAPITransId(@iTransId,0)
+declare @ContractNo varchar(max)=''
+declare @TcNo int =0
+
+
+select @ContractNo=sContractNumber from vCrm_PMSContract with(nolock) where iTransId = @iTransId
+select @TcNo=iMasterId from vCrm_TCNo with(nolock) where sName = @ContractNo
+update tCrm_PMSContract set iContractStatus=20004 where iTransId =@iTransId
+update tuCrm_PMSContract set TCNo=@TcNo where iTransId =@iTransId
+end
